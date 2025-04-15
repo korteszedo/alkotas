@@ -1,3 +1,5 @@
+const array = []; // Egy üres tömb, amely a könyvek adatait tárolja
+
 // Egy függvény, ami létrehoz egy <div> elemet a megadott osztálynévvel
 const makeDiv = (className) => {
     // Létrehoz egy új <div> elemet
@@ -104,6 +106,53 @@ const buttonFormSim = document.createElement('button');
 buttonFormSim.textContent = 'hozzáadás';
 // Hozzáadja a gombot az űrlaphoz
 formSim.appendChild(buttonFormSim);
+
+// Hozzáad egy eseményfigyelőt az űrlaphoz, amely a "submit" eseményre reagál
+formSim.addEventListener('submit', (e) => {
+    // Megakadályozza az alapértelmezett űrlapküldési viselkedést
+    e.preventDefault();
+
+    // Létrehoz egy üres objektumot az űrlap mezőinek értékeihez
+    const valueObject = {};
+
+    // Kiválasztja az összes <input> elemet az űrlapban
+    const inputFields = e.target.querySelectorAll('input');
+
+    // Végigmegy az összes <input> elemeken
+    for (const inputField of inputFields) {
+        // Hozzáadja az <input> elem azonosítóját és értékét az objektumhoz
+        valueObject[inputField.id] = inputField.value;
+    }
+
+    // Hozzáadja az objektumot a "könyvek adatait" tároló tömbhöz
+    array.push(valueObject);
+
+    // Létrehoz egy új <tr> elemet a táblázat törzséhez
+    const tableBodyRow = document.createElement('tr');
+    // Hozzáadja a <tr> elemet a <tbody>-hoz
+    tbody.appendChild(tableBodyRow);
+
+    // Létrehoz egy <td> elemet a névhez
+    const nameCell = document.createElement('td');
+    // Beállítja a <td> elem szövegét a "name" mező értékére
+    nameCell.textContent = valueObject.szerzo;
+    // Hozzáadja a <td> elemet a <tr>-hez
+    tableBodyRow.appendChild(nameCell);
+
+    // Létrehoz egy <td> elemet a születési dátumhoz
+    const birthCell = document.createElement('td');
+    // Beállítja a <td> elem szövegét a "birth" mező értékére
+    birthCell.textContent = valueObject.mufaj;
+    // Hozzáadja a <td> elemet a <tr>-hez
+    tableBodyRow.appendChild(birthCell);
+
+    // Létrehoz egy <td> elemet az irányítószámhoz
+    const zipCodeCell = document.createElement('td');
+    // Beállítja a <td> elem szövegét a "zipcode" mező értékére
+    zipCodeCell.textContent = valueObject.cim;
+    // Hozzáadja a <td> elemet a <tr>-hez
+    tableBodyRow.appendChild(zipCodeCell);
+});
 
 // A "table" elemet hozzáadja a "container" elemhez
 containerDiv.appendChild(tableDiv);
