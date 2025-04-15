@@ -48,6 +48,21 @@ class Area {
         }
         return containerDiv; // Visszaadja a konténer elemet
     }
+
+    /**
+     * Létrehoz egy gombot a megadott címkével.
+     * @param {string} label - A gomb szövege.
+     * @param {Function} [onClick] - (Opcionális) A gombhoz rendelendő kattintási eseménykezelő.
+     * @returns {HTMLButtonElement} A létrehozott gomb.
+     */
+    createButton(label, onClick) {
+        const button = document.createElement('button'); // Létrehoz egy <button> elemet
+        button.textContent = label; // Beállítja a gomb szövegét
+        if (onClick) { // Ha van kattintási eseménykezelő
+            button.addEventListener('click', onClick); // Hozzáadja az eseménykezelőt
+        }
+        return button; // Visszaadja a gombot
+    }
 }
 
 /**
@@ -76,19 +91,23 @@ class Table extends Area {
     #createPersonRow(person, tablebody) { // Létrehoz egy új sort a táblázatban a megadott személy adatai alapján
         const tableBodyRow = document.createElement('tr'); // Létrehoz egy új <tr> elemet a táblázat sorához
 
-        const szerzoCell = document.createElement('td'); // Létrehoz egy <td> elemet a szerző számára
-        szerzoCell.textContent = person.szerzo; // Beállítja a cella tartalmát a szerző nevére
-        tableBodyRow.appendChild(szerzoCell); // Hozzáadja a cellát a sorhoz
-
-        const mufajCell = document.createElement('td'); // Létrehoz egy <td> elemet a műfaj számára
-        mufajCell.textContent = person.mufaj; // Beállítja a cella tartalmát a műfaj nevére
-        tableBodyRow.appendChild(mufajCell); // Hozzáadja a cellát a sorhoz
-
-        const cimCell = document.createElement('td'); // Létrehoz egy <td> elemet a cím számára
-        cimCell.textContent = person.cim; // Beállítja a cella tartalmát a címre
-        tableBodyRow.appendChild(cimCell); // Hozzáadja a cellát a sorhoz
+        this.#createCell(tableBodyRow, person.szerzo); // Létrehoz egy cellát a szerző számára
+        this.#createCell(tableBodyRow, person.mufaj); // Létrehoz egy cellát a műfaj számára
+        this.#createCell(tableBodyRow, person.cim); // Létrehoz egy cellát a cím számára
 
         tablebody.appendChild(tableBodyRow); // Hozzáadja a sort a táblázat <tbody> eleméhez
+    }
+
+    /**
+     * Létrehoz egy cellát a megadott tartalommal.
+     * @param {HTMLTableRowElement} row - A táblázat sora, amelyhez a cellát hozzáadjuk.
+     * @param {string} textContent - A cella tartalma.
+     * @param {string} [type='td'] - A cella típusa (alapértelmezett: 'td').
+     */
+    #createCell(row, textContent, type = 'td') {
+        const cell = document.createElement(type); // Létrehoz egy új cellát
+        cell.textContent = textContent; // Beállítja a cella tartalmát
+        row.appendChild(cell); // Hozzáadja a cellát a sorhoz
     }
 
     /**
@@ -134,39 +153,58 @@ class Form extends Area {
         super(cssClass, manager); // Meghívja az Area osztály konstruktorát
         this.#formFieldArray = []; // Inicializálja a FormField objektumok tömbjét
 
-        const form = document.createElement('form'); // Létrehoz egy új <form> elemet
-        this.div.appendChild(form); // Hozzáadja az űrlapot az Area által létrehozott <div>-hez
-
-        for (const fieldElement of fieldElementList) { // Végigmegy az űrlap mezőinek listáján
-            const formField = new FormField(fieldElement.fieldid, fieldElement.fieldLabel); // Létrehoz egy új FormField objektumot
-            this.#formFieldArray.push(formField); // Hozzáadja a FormField objektumot a tömbhöz
-            form.appendChild(formField.getDiv()); // Hozzáadja a FormField <div> elemét az űrlaphoz
-        }
-
-        const button = document.createElement('button'); // Létrehoz egy új <button> elemet
-        button.textContent = 'hozzáadás'; // Beállítja a gomb szövegét
-        form.appendChild(button); // Hozzáadja a gombot az űrlaphoz
+        const form = this.#createForm(fieldElementList); // Létrehozza az űrlapot
 
         form.addEventListener('submit', (e) => { // Hozzáad egy eseményfigyelőt az űrlap küldéséhez
             e.preventDefault(); // Megakadályozza az alapértelmezett űrlapküldést
 
             const valueObject = {}; // Létrehoz egy objektumot az értékek tárolására
-            let valid = true; // Validációs állapot
 
-            for (const formField of this.#formFieldArray) {
-                formField.error = ''; // Törli az előző hibaüzenetet
-                if (formField.value === '') { // Ellenőrzi, hogy az érték üres-e
-                    formField.error = 'Kötelező megadni'; // Hibaüzenet, ha az érték üres
-                    valid = false; // A validáció sikertelen
+            if (this.#validateAllFields()) { // Ha minden mező érvényes
+                for (const formField of this.#formFieldArray) {
+                    valueObject[formField.id] = formField.value; // Hozzáadja az értéket az objektumhoz
                 }
-                valueObject[formField.id] = formField.value; // Hozzáadja az értéket az objektumhoz
-            }
-
-            if (valid) { // Ha minden mező érvényes
                 const person = new Person(valueObject.szerzo, valueObject.mufaj, valueObject.cim); // Létrehoz egy új Person objektumot
                 this.manager.addPerson(person); // Hozzáadja a személyt a manager-hez
             }
         });
+    }
+
+    /**
+     * Ellenőrzi az összes mezőt, és visszaadja, hogy érvényesek-e.
+     * @returns {boolean} `true`, ha minden mező érvényes; különben `false`.
+     */
+    #validateAllFields() {
+        let valid = true; // Inicializálja a validációs állapotot
+        for (const formField of this.#formFieldArray) { // Végigmegy az összes mezőn
+            formField.error = ''; // Törli az előző hibaüzenetet
+            if (formField.value === '') { // Ellenőrzi, hogy a mező üres-e
+                formField.error = 'Kötelező megadni'; // Beállítja a hibaüzenetet
+                valid = false; // A validáció sikertelen
+            }
+        }
+        return valid; // Visszaadja a validációs állapotot
+    }
+
+    /**
+     * Létrehozza az űrlapot a megadott mezőkonfiguráció alapján.
+     * @param {Array<Object>} fieldConfigurationList - Az űrlap mezőinek konfigurációs listája.
+     * @returns {HTMLFormElement} A létrehozott űrlap.
+     */
+    #createForm(fieldConfigurationList) {
+        const form = document.createElement('form'); // Létrehoz egy <form> elemet
+        this.div.appendChild(form); // Hozzáadja az űrlapot az Area által létrehozott <div>-hez
+
+        for (const fieldElement of fieldConfigurationList) { // Végigmegy az űrlap mezőinek listáján
+            const formField = new FormField(fieldElement.fieldid, fieldElement.fieldLabel); // Létrehoz egy új FormField objektumot
+            this.#formFieldArray.push(formField); // Hozzáadja a FormField objektumot a tömbhöz
+            form.appendChild(formField.getDiv()); // Hozzáadja a FormField <div> elemét az űrlaphoz
+        }
+
+        const button = this.createButton('Hozzáadás'); // Létrehozza a "Hozzáadás" gombot
+        form.appendChild(button); // Hozzáadja a gombot az űrlaphoz
+
+        return form; // Visszaadja az űrlapot
     }
 }
 
@@ -230,7 +268,7 @@ class FormField {
         const br1 = document.createElement('br'); // Létrehoz egy sortörést
         const br2 = document.createElement('br'); // Létrehoz egy második sortörést
         const htmlElements = [this.#labelElement, br1, this.#inputElement, br2, this.#errorElement]; // Az űrlapmező elemei
-        for (const element of htmlElements) { // Végigmegy az elemek listáján
+        for (const element of htmlElements) {  // Végigmegy az elemek listáján
             div.appendChild(element); // Hozzáadja az elemeket a <div>-hez
         }
         return div; // Visszaadja a <div> elemet
@@ -256,22 +294,7 @@ class Upload extends Area { // Az Upload osztály az Area osztályból származi
         this.div.appendChild(input); // Hozzáadja az input elemet az Area által létrehozott <div>-hez
 
         // Hozzáad egy eseményfigyelőt a fájlfeltöltő mezőhöz
-        input.addEventListener('change', (e) => { // Fájl kiválasztás esemény
-            const file = e.target.files[0]; // Lekéri a kiválasztott fájlt
-            const fileReader = new FileReader(); // Létrehoz egy FileReader példányt
-
-            fileReader.onload = () => { // Eseményfigyelő, amely akkor fut le, amikor a fájl beolvasása befejeződik
-                const fileLines = fileReader.result.split('\n'); // Feldarabolja a fájl tartalmát sorokra
-                const removedHeadLines = fileLines.slice(1); // Eltávolítja az első sort (fejléc)
-                for (const line of removedHeadLines) { // Végigmegy a fájl sorain
-                    const trimmedLine = line.trim(); // Eltávolítja a felesleges szóközöket
-                    const fields = trimmedLine.split(';'); // Feldarabolja a sort pontosvesszők mentén
-                    const person = new Person(fields[0], fields[1], fields[2]); // Létrehoz egy új Person objektumot
-                    this.manager.addPerson(person); // Hozzáadja a személyt a manager-hez
-                }
-            };
-            fileReader.readAsText(file); // Beolvassa a fájl tartalmát szövegként
-        });
+        input.addEventListener('change', this.#importInputEventListener());
 
         // Létrehoz egy "Letöltés" gombot
         const exportButton = document.createElement('button'); // Létrehoz egy <button> elemet
@@ -279,7 +302,40 @@ class Upload extends Area { // Az Upload osztály az Area osztályból származi
         this.div.appendChild(exportButton); // Hozzáadja a gombot az Area által létrehozott <div>-hez
 
         // Hozzáad egy eseményfigyelőt a "Letöltés" gombhoz
-        exportButton.addEventListener('click', () => { // Kattintás esemény
+        exportButton.addEventListener('click', this.#exportButtonEventListener());
+    }
+
+    /**
+     * Létrehozza a fájlfeltöltő mező eseménykezelőjét.
+     * @returns {Function} Az eseménykezelő függvény.
+     */
+    #importInputEventListener() {
+        return (e) => {
+            const file = e.target.files[0]; // Lekéri a kiválasztott fájlt
+            const fileReader = new FileReader(); // Létrehoz egy FileReader példányt
+
+            fileReader.onload = () => {
+                const fileLines = fileReader.result.split('\n'); // Feldarabolja a fájl tartalmát sorokra
+                const removedHeadLines = fileLines.slice(1); // Eltávolítja az első sort (fejléc)
+                for (const line of removedHeadLines) { // Végigmegy a fájl sorain
+                    const trimmedLine = line.trim(); // Eltávolítja a felesleges szóközöket
+                    if (trimmedLine) { // Ellenőrzi, hogy a sor nem üres
+                        const fields = trimmedLine.split(';'); // Feldarabolja a sort pontosvesszők mentén
+                        const person = new Person(fields[0], fields[1], fields[2]); // Létrehoz egy új Person objektumot
+                        this.manager.addPerson(person); // Hozzáadja a személyt a manager-hez
+                    }
+                }
+            };
+            fileReader.readAsText(file); // Beolvassa a fájl tartalmát szövegként
+        };
+    }
+
+    /**
+     * Létrehozza a "Letöltés" gomb eseménykezelőjét.
+     * @returns {Function} Az eseménykezelő függvény.
+     */
+    #exportButtonEventListener() {
+        return () => {
             const link = document.createElement('a'); // Létrehoz egy <a> elemet
             const content = this.manager.generateExportString(); // Lekéri az exportálandó tartalmat a manager-től
             const file = new Blob([content], { type: 'text/csv' }); // Létrehoz egy új Blob objektumot a tartalommal
@@ -287,6 +343,6 @@ class Upload extends Area { // Az Upload osztály az Area osztályból származi
             link.download = 'newdata.csv'; // Beállítja a letöltendő fájl nevét
             link.click(); // Kattintást szimulál a letöltés elindításához
             URL.revokeObjectURL(link.href); // Felszabadítja az URL-t
-        });
+        };
     }
 }
