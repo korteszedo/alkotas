@@ -4,7 +4,7 @@ const separator = document.createElement('hr');
 document.body.appendChild(separator);
 
 // Létrehoz egy új "table" osztályú <div> elemet az Area osztály segítségével
-const table = new Area('table');
+const table = new Table('table');
 
 // Létrehoz egy új "form" osztályú <div> elemet az Area osztály segítségével
 const form = new Area('form');
