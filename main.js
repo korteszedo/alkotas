@@ -80,6 +80,14 @@ const buttonFormSim = document.createElement('button');
 buttonFormSim.textContent = 'hozzáadás'; // Beállítja a gomb szövegét
 formSim.appendChild(buttonFormSim); // Hozzáadja a gombot az űrlaphoz
 
+// Létrehoz egy fájlfeltöltő mezőt
+const fileInput = document.createElement('input'); // Létrehoz egy <input> elemet
+fileInput.id = 'fileinput'; // Beállítja az azonosítót
+fileInput.type = 'file'; // Beállítja a típusát fájlfeltöltésre
+
+// Hozzáadja a fájlfeltöltő mezőt a "hozzáadás" gomb mellé
+formSim.appendChild(fileInput); // Hozzáadja a fájlfeltöltő mezőt az űrlaphoz
+
 // Hozzáad egy eseményfigyelőt az űrlaphoz, amely a "submit" eseményre reagál
 formSim.addEventListener('submit', (e) => {
     e.preventDefault(); // Megakadályozza az alapértelmezett űrlapküldési viselkedést
@@ -123,6 +131,43 @@ formSim.addEventListener('submit', (e) => {
         zipCodeCell.textContent = valueObject.cim; // Beállítja a cella tartalmát
         tableBodyRow.appendChild(zipCodeCell); // Hozzáadja a cellát a sorhoz
     }
+});
+
+// Hozzáad egy eseményfigyelőt a fájlfeltöltő mezőhöz
+fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0]; // Lekéri a kiválasztott fájlt
+    const fileReader = new FileReader(); // Létrehoz egy FileReader példányt
+
+    fileReader.onload = () => {
+        const fileLines = fileReader.result.split('\n'); // Feldarabolja a fájl tartalmát sorokra
+        const removedHeadLines = fileLines.slice(1); // Eltávolítja az első sort (fejléc)
+        for (const line of removedHeadLines) {
+            const trimmedLine = line.trim(); // Eltávolítja a felesleges szóközöket
+            const fields = trimmedLine.split(';'); // Feldarabolja a sort pontosvesszők mentén
+            const pers = {
+                name: fields[0],
+                birth: fields[1],
+                zipcode: fields[2]
+            };
+            array.push(pers); // Hozzáadja az objektumot a tömbhöz
+
+            const tableBodyRow = document.createElement('tr'); // Létrehoz egy új <tr> elemet
+            tbody.appendChild(tableBodyRow); // Hozzáadja a sort a táblázathoz
+
+            const nameCell = document.createElement('td'); // Létrehoz egy új <td> elemet a név számára
+            nameCell.textContent = pers.name; // Beállítja a cella tartalmát
+            tableBodyRow.appendChild(nameCell); // Hozzáadja a cellát a sorhoz
+
+            const birthCell = document.createElement('td'); // Létrehoz egy új <td> elemet a születési dátum számára
+            birthCell.textContent = pers.birth; // Beállítja a cella tartalmát
+            tableBodyRow.appendChild(birthCell); // Hozzáadja a cellát a sorhoz
+
+            const zipCodeCell = document.createElement('td'); // Létrehoz egy új <td> elemet az irányítószám számára
+            zipCodeCell.textContent = pers.zipcode; // Beállítja a cella tartalmát
+            tableBodyRow.appendChild(zipCodeCell); // Hozzáadja a cellát a sorhoz
+        }
+    };
+    fileReader.readAsText(file); // Beolvassa a fájl tartalmát szövegként
 });
 
 // A "table" elemet hozzáadja a "container" elemhez
