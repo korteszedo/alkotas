@@ -264,5 +264,21 @@ class Upload extends Area {
             };
             fileReader.readAsText(file); // Beolvassa a fájl tartalmát szövegként
         });
+
+        // Létrehoz egy "Letöltés" gombot
+        const exportButton = document.createElement('button'); // Létrehoz egy <button> elemet
+        exportButton.textContent = 'Letöltés'; // Beállítja a gomb szövegét
+        this.div.appendChild(exportButton); // Hozzáadja a gombot az Area által létrehozott <div>-hez
+
+        // Hozzáad egy eseményfigyelőt a "Letöltés" gombhoz
+        exportButton.addEventListener('click', () => {
+            const link = document.createElement('a'); // Létrehoz egy <a> elemet
+            const content = this.manager.generateExportString(); // Lekéri az exportálandó tartalmat a manager-től
+            const file = new Blob([content], { type: 'text/csv' }); // Létrehoz egy új Blob objektumot a tartalommal
+            link.href = URL.createObjectURL(file); // Beállítja a letöltési linket
+            link.download = 'newdata.csv'; // Beállítja a letöltendő fájl nevét
+            link.click(); // Kattintást szimulál a letöltés elindításához
+            URL.revokeObjectURL(link.href); // Felszabadítja az URL-t
+        });
     }
 }

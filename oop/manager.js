@@ -34,4 +34,16 @@ class Manager {
     setAddPersonCallback(callback) {
         this.addPersonCallback = callback; // Beállítja a callback függvényt
     }
+
+    /**
+     * Generál egy exportálható CSV formátumú szöveget a személyek adataiból.
+     * @returns {string} A személyek adatait tartalmazó CSV formátumú szöveg.
+     */
+    generateExportString() {
+        const result = ['szerzo;mufaj;cim']; // A CSV fejléc sora
+        for (const person of this.persons) {
+            result.push(`${person.szerzo};${person.mufaj};${person.cim}`); // Hozzáadja a személy adatait
+        }
+        return result.join('\n'); // Összefűzi a sorokat új sor karakterrel
+    }
 }
