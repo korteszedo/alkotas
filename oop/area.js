@@ -145,15 +145,22 @@ class Form extends Area {
         form.addEventListener('submit', (e) => {
             e.preventDefault(); // Megakadályozza az alapértelmezett űrlapküldést
 
-            const inputFieldList = e.target.querySelectorAll('input'); // Kiválasztja az összes input mezőt
+            
             const valueObject = {}; // Létrehoz egy objektumot az értékek tárolására
 
-            for (const inputField of inputFieldList) {
-                valueObject[inputField.id] = inputField.value; // Hozzáadja az input mező értékét az objektumhoz
-            }
-
-            const person = new Person(valueObject.szerzo, valueObject.mufaj, valueObject.cim); // Létrehoz egy új Person objektumot
-            this.manager.addPerson(person); // Hozzáadja a személyt a manager-hez
+            let valid = true;
+             for(const formField of this.#formFieldArray){
+                 formField.error = '';
+                 if(formField.value === ''){
+                     formField.error = 'Kotelezo megadni';
+                     valid = false;
+                    }
+                    valueObject[formField.id] = formField.value;
+                }
+                if(valid){
+                    const person = new Person(valueObject.szerzo, valueObject.mufaj, valueObject.cim);
+                    this.manager.addPerson(person);
+                } 
         });
     }
 }
