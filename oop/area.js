@@ -10,16 +10,16 @@ class Area {
      * A div getter, amely visszaadja a létrehozott <div> elemet.
      * @returns {HTMLDivElement} A létrehozott <div> elem.
      */
-    get div() {
-        return this.#div;
+    get div() { // Getter metódus a <div> elemhez
+        return this.#div; // Visszaadja a létrehozott <div> elemet
     }
 
     /**
      * A manager getter, amely visszaadja a manager objektumot.
      * @returns {Object} A manager objektum.
      */
-    get manager() {
-        return this.#manager;
+    get manager() { // Getter metódus a manager objektumhoz
+        return this.#manager; // Visszaadja a manager objektumot
     }
 
     /**
@@ -27,7 +27,7 @@ class Area {
      * @param {string} className - Az új <div> elemhez rendelendő osztálynév.
      * @param {Object} manager - A manager objektum, amely a könyvek kezelésére szolgál.
      */
-    constructor(className, manager) {
+    constructor(className, manager) { // Konstruktormódszer
         this.#manager = manager; // Inicializálja a manager-t
         const container = this.#getContainerDiv(); // Lekéri vagy létrehozza a "containeroop" konténert
         this.#div = document.createElement('div'); // Létrehoz egy új <div> elemet
@@ -39,7 +39,7 @@ class Area {
      * Lekéri vagy létrehozza a "containeroop" osztályú konténer <div> elemet.
      * @returns {HTMLDivElement} A "containeroop" osztályú konténer <div> elem.
      */
-    #getContainerDiv() {
+    #getContainerDiv() { // Privát metódus a konténer <div> elem lekérésére vagy létrehozására
         let containerDiv = document.querySelector('.containeroop'); // Megkeresi a "containeroop" osztályú elemet
         if (!containerDiv) { // Ha nem található, létrehozza
             containerDiv = document.createElement('div'); // Létrehoz egy új <div> elemet
@@ -59,36 +59,43 @@ class Table extends Area {
      * @param {string} cssClass - Az új táblázatot tartalmazó <div> elemhez rendelendő osztálynév.
      * @param {Object} manager - A manager objektum, amely a könyvek kezelésére szolgál.
      */
-    constructor(cssClass, manager) {
+    constructor(cssClass, manager) { // konstruktor létrehozása
         super(cssClass, manager); // Meghívja az Area osztály konstruktorát
-
-        const tbody = this.#createTable(); // Létrehozza a táblázatot és visszaadja a <tbody> elemet
-
-        // Beállítja a callback függvényt a manager-ben
+        const tbody = this.#createTable();
         this.manager.setAddPersonCallback((person) => {
-            const tableBodyRow = document.createElement('tr'); // Létrehoz egy új <tr> elemet
-
-            const szerzoCell = document.createElement('td'); // Létrehoz egy új <td> elemet a szerző számára
-            szerzoCell.textContent = person.szerzo; // Beállítja a cella tartalmát
-            tableBodyRow.appendChild(szerzoCell); // Hozzáadja a cellát a sorhoz
-
-            const mufajCell = document.createElement('td'); // Létrehoz egy új <td> elemet a műfaj számára
-            mufajCell.textContent = person.mufaj; // Beállítja a cella tartalmát
-            tableBodyRow.appendChild(mufajCell); // Hozzáadja a cellát a sorhoz
-
-            const cimCell = document.createElement('td'); // Létrehoz egy új <td> elemet a cím számára
-            cimCell.textContent = person.cim; // Beállítja a cella tartalmát
-            tableBodyRow.appendChild(cimCell); // Hozzáadja a cellát a sorhoz
-
-            tbody.appendChild(tableBodyRow); // Hozzáadja a sort a <tbody>-hoz
+            this.#createPersonRow(person, tbody); // Hozzáad egy új sort a táblázathoz, amikor egy személyt hozzáadnak
         });
+        this.manager.setRenderTableCallback((personArray) => {
+            tbody.innerHTML = ''; // Törli a táblázat tartalmát
+            for (const person of personArray) { // Végigmegy a szűrt személyek listáján
+                this.#createPersonRow(person, tbody); // Új sorokat hoz létre a táblázatban a szűrt személyek alapján
+            }
+        });
+    }
+
+    #createPersonRow(person, tablebody) { // Létrehoz egy új sort a táblázatban a megadott személy adatai alapján
+        const tableBodyRow = document.createElement('tr'); // Létrehoz egy új <tr> elemet a táblázat sorához
+
+        const szerzoCell = document.createElement('td'); // Létrehoz egy <td> elemet a szerző számára
+        szerzoCell.textContent = person.szerzo; // Beállítja a cella tartalmát a szerző nevére
+        tableBodyRow.appendChild(szerzoCell); // Hozzáadja a cellát a sorhoz
+
+        const mufajCell = document.createElement('td'); // Létrehoz egy <td> elemet a műfaj számára
+        mufajCell.textContent = person.mufaj; // Beállítja a cella tartalmát a műfaj nevére
+        tableBodyRow.appendChild(mufajCell); // Hozzáadja a cellát a sorhoz
+
+        const cimCell = document.createElement('td'); // Létrehoz egy <td> elemet a cím számára
+        cimCell.textContent = person.cim; // Beállítja a cella tartalmát a címre
+        tableBodyRow.appendChild(cimCell); // Hozzáadja a cellát a sorhoz
+
+        tablebody.appendChild(tableBodyRow); // Hozzáadja a sort a táblázat <tbody> eleméhez
     }
 
     /**
      * Létrehozza a táblázatot, és visszaadja a <tbody> elemet.
      * @returns {HTMLTableSectionElement} A táblázat <tbody> eleme.
      */
-    #createTable() {
+    #createTable() { // Létrehozza a táblázatot
         const table = document.createElement('table'); // Létrehoz egy új <table> elemet
         this.div.appendChild(table); // Hozzáadja a táblázatot az Area által létrehozott <div>-hez
 
@@ -99,7 +106,7 @@ class Table extends Area {
         thead.appendChild(theadRow); // Hozzáadja a <thead>-hez
 
         const theadCells = ['Szerző', 'Műfaj', 'Cím']; // A fejléc celláinak tartalma
-        for (const cellContent of theadCells) {
+        for (const cellContent of theadCells) { // Végigmegy a fejléc cellák tartalmán
             const thcell = document.createElement('th'); // Létrehoz egy új <th> elemet
             thcell.innerText = cellContent; // Beállítja a cella tartalmát
             theadRow.appendChild(thcell); // Hozzáadja a cellát a fejléc sorhoz
@@ -140,7 +147,7 @@ class Form extends Area {
         button.textContent = 'hozzáadás'; // Beállítja a gomb szövegét
         form.appendChild(button); // Hozzáadja a gombot az űrlaphoz
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', (e) => { // Hozzáad egy eseményfigyelőt az űrlap küldéséhez
             e.preventDefault(); // Megakadályozza az alapértelmezett űrlapküldést
 
             const valueObject = {}; // Létrehoz egy objektumot az értékek tárolására
@@ -176,15 +183,15 @@ class FormField {
      * Az id getter metódusa.
      * @returns {string} Az űrlapmező azonosítója.
      */
-    get id() {
-        return this.#id;
+    get id() { // Visszaadja az űrlapmező azonosítóját
+        return this.#id; // Visszaadja az űrlapmező azonosítóját
     }
 
     /**
      * A value getter metódusa.
      * @returns {string} Az input mező aktuális értéke.
      */
-    get value() {
+    get value() { // Visszaadja az input mező értékét
         return this.#inputElement.value; // Visszaadja az input mező értékét
     }
 
@@ -193,7 +200,7 @@ class FormField {
      * Beállítja a hibaüzenet szövegét.
      * @param {string} value - A hibaüzenet szövege.
      */
-    set error(value) {
+    set error(value) { // Beállítja a hibaüzenetet
         this.#errorElement.textContent = value; // Beállítja a hibaüzenet szövegét
     }
 
@@ -203,7 +210,7 @@ class FormField {
      * @param {string} id - Az űrlapmező azonosítója.
      * @param {string} labelContent - Az űrlapmező címkéjének szövege.
      */
-    constructor(id, labelContent) {
+    constructor(id, labelContent) { //konstruktor létrehozása
         this.#id = id; // Beállítja az azonosítót
         this.#labelElement = document.createElement('label'); // Létrehoz egy <label> elemet
         this.#labelElement.htmlFor = id; // Beállítja a "for" attribútumot
@@ -218,12 +225,12 @@ class FormField {
      * Létrehoz egy <div> elemet, amely tartalmazza az űrlapmező összes elemét.
      * @returns {HTMLDivElement} A létrehozott <div> elem.
      */
-    getDiv() {
+    getDiv() { // Létrehozza a <div> elemet
         const div = makeDiv('field'); // Létrehoz egy "field" osztályú <div> elemet
         const br1 = document.createElement('br'); // Létrehoz egy sortörést
         const br2 = document.createElement('br'); // Létrehoz egy második sortörést
         const htmlElements = [this.#labelElement, br1, this.#inputElement, br2, this.#errorElement]; // Az űrlapmező elemei
-        for (const element of htmlElements) {
+        for (const element of htmlElements) { // Végigmegy az elemek listáján
             div.appendChild(element); // Hozzáadja az elemeket a <div>-hez
         }
         return div; // Visszaadja a <div> elemet
@@ -234,13 +241,13 @@ class FormField {
  * Az Upload osztály az Area osztályból származik, és egy fájlfeltöltő mezőt hoz létre.
  * A feltöltött fájl tartalmát feldolgozza, és a manager objektumon keresztül hozzáadja a személyeket.
  */
-class Upload extends Area {
+class Upload extends Area { // Az Upload osztály az Area osztályból származik
     /**
      * Az Upload osztály konstruktora.
      * @param {string} cssClass - Az új fájlfeltöltőt tartalmazó <div> elemhez rendelendő osztálynév.
      * @param {Object} manager - A manager objektum, amely a személyek kezelésére szolgál.
      */
-    constructor(cssClass, manager) {
+    constructor(cssClass, manager) { // konstruktor létrehozása
         super(cssClass, manager); // Meghívja az Area osztály konstruktorát
 
         const input = document.createElement('input'); // Létrehoz egy <input> elemet
@@ -249,14 +256,14 @@ class Upload extends Area {
         this.div.appendChild(input); // Hozzáadja az input elemet az Area által létrehozott <div>-hez
 
         // Hozzáad egy eseményfigyelőt a fájlfeltöltő mezőhöz
-        input.addEventListener('change', (e) => {
+        input.addEventListener('change', (e) => { // Fájl kiválasztás esemény
             const file = e.target.files[0]; // Lekéri a kiválasztott fájlt
             const fileReader = new FileReader(); // Létrehoz egy FileReader példányt
 
-            fileReader.onload = () => {
+            fileReader.onload = () => { // Eseményfigyelő, amely akkor fut le, amikor a fájl beolvasása befejeződik
                 const fileLines = fileReader.result.split('\n'); // Feldarabolja a fájl tartalmát sorokra
                 const removedHeadLines = fileLines.slice(1); // Eltávolítja az első sort (fejléc)
-                for (const line of removedHeadLines) {
+                for (const line of removedHeadLines) { // Végigmegy a fájl sorain
                     const trimmedLine = line.trim(); // Eltávolítja a felesleges szóközöket
                     const fields = trimmedLine.split(';'); // Feldarabolja a sort pontosvesszők mentén
                     const person = new Person(fields[0], fields[1], fields[2]); // Létrehoz egy új Person objektumot
@@ -272,7 +279,7 @@ class Upload extends Area {
         this.div.appendChild(exportButton); // Hozzáadja a gombot az Area által létrehozott <div>-hez
 
         // Hozzáad egy eseményfigyelőt a "Letöltés" gombhoz
-        exportButton.addEventListener('click', () => {
+        exportButton.addEventListener('click', () => { // Kattintás esemény
             const link = document.createElement('a'); // Létrehoz egy <a> elemet
             const content = this.manager.generateExportString(); // Lekéri az exportálandó tartalmat a manager-től
             const file = new Blob([content], { type: 'text/csv' }); // Létrehoz egy új Blob objektumot a tartalommal

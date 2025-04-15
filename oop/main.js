@@ -33,4 +33,5 @@ const table = new Table('table', manager); // Létrehozza a Table példányt, é
  */
 const form = new Form('form', fieldConfig, manager); // Létrehozza a Form példányt, és átadja a mezőket és a manager-t
 
-const fileUplad = new Upload('upload', manager); // Létrehozza a FileUpload példányt, és átadja a manager-t
+const fileUplad = new Upload('upload', manager); // Fájlfeltöltő mező létrehozása
+ const filterOop = new Filter('filter', manager); // Szűrő mező létrehozása
