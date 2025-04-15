@@ -115,6 +115,9 @@ class Table extends Area {
  * A Form osztály az Area osztályból származik, és egy űrlapot hoz létre a megadott osztálynévvel.
  */
 class Form extends Area {
+
+    #formFieldArray; // Privát mező a FormField objektumok tárolására
+
     /**
      * A Form osztály konstruktora.
      * @param {string} cssClass - Az új űrlapot tartalmazó <div> elemhez rendelendő osztálynév.
@@ -123,24 +126,16 @@ class Form extends Area {
      */
     constructor(cssClass, fieldElementList, manager) {
         super(cssClass, manager); // Meghívja az Area osztály konstruktorát
+        this.#formFieldArray = []; // Inicializálja a FormField objektumok tömbjét
+
 
         const form = document.createElement('form'); // Létrehoz egy új <form> elemet
         this.div.appendChild(form); // Hozzáadja az űrlapot az Area által létrehozott <div>-hez
 
-        for (const fieldElement of fieldElementList) {
-            const field = document.createElement('div'); // Létrehoz egy új <div> elemet a mező számára
-            field.className = 'field'; // Beállítja az osztálynevet
-            form.appendChild(field); // Hozzáadja a mezőt az űrlaphoz
-
-            const label = document.createElement('label'); // Létrehoz egy új <label> elemet
-            label.htmlFor = fieldElement.fieldid; // Beállítja a "for" attribútumot
-            label.textContent = fieldElement.fieldLabel; // Beállítja a címkét
-            field.appendChild(label); // Hozzáadja a címkét a mezőhöz
-
-            const input = document.createElement('input'); // Létrehoz egy új <input> elemet
-            input.id = fieldElement.fieldid; // Beállítja az azonosítót
-            field.appendChild(document.createElement('br')); // Hozzáad egy sortörést
-            field.appendChild(input); // Hozzáadja az input mezőt a mezőhöz
+        for (const fieldElement of fieldElementList) { // Végigmegy az űrlap mezőinek listáján
+            const formField = new FormField(fieldElement.fieldid, fieldElement.fieldLabel); // Létrehoz egy új FormField objektumot
+             this.#formFieldArray.push(formField); // Hozzáadja a FormField objektumot a tömbhöz
+             form.appendChild(formField.getDiv()); // Hozzáadja a FormField <div> elemét az űrlaphoz
         }
 
         const button = document.createElement('button'); // Létrehoz egy új <button> elemet
@@ -160,5 +155,69 @@ class Form extends Area {
             const person = new Person(valueObject.szerzo, valueObject.mufaj, valueObject.cim); // Létrehoz egy új Person objektumot
             this.manager.addPerson(person); // Hozzáadja a személyt a manager-hez
         });
+    }
+}
+
+class FormField {
+    #id; // Privát mező az űrlapmező azonosítójának tárolására
+    #inputElement; // Privát mező az input elem tárolására
+    #labelElement; // Privát mező a label elem tárolására
+    #errorElement; // Privát mező a hibaüzenet elem tárolására
+
+    /**
+     * Az id getter metódusa.
+     * @returns {string} Az űrlapmező azonosítója.
+     */
+    get id() {
+        return this.#id;
+    }
+
+    /**
+     * A value getter metódusa.
+     * @returns {string} Az input mező aktuális értéke.
+     */
+    get value() {
+        return this.#inputElement.value; // Visszaadja az input mező értékét
+    }
+
+    /**
+     * Az error setter metódusa.
+     * Beállítja a hibaüzenet szövegét.
+     * @param {string} value - A hibaüzenet szövege.
+     */
+    set error(value) {
+        this.#errorElement.textContent = value; // Beállítja a hibaüzenet szövegét
+    }
+
+    /**
+     * A FormField osztály konstruktora.
+     * Inicializálja az űrlapmezőhöz tartozó elemeket.
+     * @param {string} id - Az űrlapmező azonosítója.
+     * @param {string} labelContent - Az űrlapmező címkéjének szövege.
+     */
+    constructor(id, labelContent) {
+        this.#id = id; // Beállítja az azonosítót
+        this.#labelElement = document.createElement('label'); // Létrehoz egy <label> elemet
+        this.#labelElement.htmlFor = id; // Beállítja a "for" attribútumot
+        this.#labelElement.textContent = labelContent; // Beállítja a címke szövegét
+        this.#inputElement = document.createElement('input'); // Létrehoz egy <input> elemet
+        this.#inputElement.id = id; // Beállítja az input elem azonosítóját
+        this.#errorElement = document.createElement('span'); // Létrehoz egy <span> elemet a hibaüzenethez
+        this.#errorElement.className = 'error'; // Beállítja a hibaüzenet osztályát
+    }
+
+    /**
+     * Létrehoz egy <div> elemet, amely tartalmazza az űrlapmező összes elemét.
+     * @returns {HTMLDivElement} A létrehozott <div> elem.
+     */
+    getDiv() {
+        const div = makeDiv('field'); // Létrehoz egy "field" osztályú <div> elemet
+        const br1 = document.createElement('br'); // Létrehoz egy sortörést
+        const br2 = document.createElement('br'); // Létrehoz egy második sortörést
+        const htmlElements = [this.#labelElement, br1, this.#inputElement, br2, this.#errorElement]; // Az űrlapmező elemei
+        for (const element of htmlElements) {
+            div.appendChild(element); // Hozzáadja az elemeket a <div>-hez
+        }
+        return div; // Visszaadja a <div> elemet
     }
 }
