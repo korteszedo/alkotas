@@ -51,6 +51,60 @@ const tbody = document.createElement('tbody');
 // Hozzáadja a <tbody> elemet a <table>-hez
 tableSim.appendChild(tbody);
 
+// Létrehoz egy <form> elemet
+const formSim = document.createElement('form');
+// Hozzáadja a <form> elemet a "form" osztályú <div>-hez
+formDiv.appendChild(formSim);
+
+// Egy tömb, amely az űrlap mezőinek azonosítóit és címkéit tartalmazza
+const fieldElementList = [
+    {
+        fieldid: 'szerzo', // Azonosító: szerző
+        fieldLabel: 'Szerző' // Címke: Szerző
+    },
+    {
+        fieldid: 'mufaj', // Azonosító: műfaj
+        fieldLabel: 'Műfaj' // Címke: Műfaj
+    },
+    {
+        fieldid: 'cim', // Azonosító: cím
+        fieldLabel: 'Cím' // Címke: Cím
+    }
+];
+
+// Végigmegy az űrlap mezőinek listáján
+for (const fieldElement of fieldElementList) {
+    // Létrehoz egy "field" osztályú <div> elemet
+    const field = makeDiv('field');
+    // Hozzáadja a "field" elemet az űrlaphoz
+    formSim.appendChild(field);
+
+    // Létrehoz egy <label> elemet
+    const label = document.createElement('label');
+    // Beállítja a <label> elem "for" attribútumát az aktuális mező azonosítójára
+    label.htmlFor = fieldElement.fieldid;
+    // Beállítja a <label> elem szövegét az aktuális mező címkéjére
+    label.textContent = fieldElement.fieldLabel;
+    // Hozzáadja a <label> elemet a "field" <div>-hez
+    field.appendChild(label);
+
+    // Létrehoz egy <input> elemet
+    const input = document.createElement('input');
+    // Beállítja az <input> elem azonosítóját
+    input.id = fieldElement.fieldid;
+    // Hozzáad egy sortörést a "field" <div>-hez
+    field.appendChild(document.createElement('br'));
+    // Hozzáadja az <input> elemet a "field" <div>-hez
+    field.appendChild(input);
+}
+
+// Létrehoz egy <button> elemet az űrlaphoz
+const buttonFormSim = document.createElement('button');
+// Beállítja a gomb szövegét
+buttonFormSim.textContent = 'hozzáadás';
+// Hozzáadja a gombot az űrlaphoz
+formSim.appendChild(buttonFormSim);
+
 // A "table" elemet hozzáadja a "container" elemhez
 containerDiv.appendChild(tableDiv);
 // A "form" elemet is hozzáadja a "container" elemhez
