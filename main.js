@@ -7,6 +7,16 @@ const makeDiv = (className) => {
     return div;
 };
 
+const filter = (personArray, callback) => {
+    const result = [];
+    for(const element of personArray){
+        if(callback(element)){
+            result.push(element);
+        }
+    }
+    return result;
+}
+
 // Létrehoz egy "container" osztályú <div> elemet
 const containerDiv = makeDiv('container');
 document.body.appendChild(containerDiv);
@@ -198,4 +208,71 @@ exportButton.addEventListener('click', () => {
     link.download = 'newdata.csv'; // Beállítja a letöltendő fájl nevét
     link.click(); // Kattintást szimulál a letöltés elindításához
     URL.revokeObjectURL(link.href); // Felszabadítja az URL-t
+});
+
+const filterFormDiv = makeDiv('filterForm');
+containerDiv.appendChild(filterFormDiv);
+
+const formForFilter = document.createElement('form');
+filterFormDiv.appendChild(formForFilter);
+
+const select = document.createElement('select');
+formForFilter.appendChild(select);
+
+const options = [
+    { value: '', innerText: '' },
+    { value: 'szerzo', innerText: 'Szerző' },
+    { value: 'mufaj', innerText: 'Műfaj' },
+    { value: 'cim', innerText: 'Cím' }
+];
+
+for (const option of options) {
+    const optionElement = document.createElement('option');
+    optionElement.value = option.value;
+    optionElement.innerText = option.innerText;
+    select.appendChild(optionElement);
+}
+
+const input = document.createElement('input');
+input.id = 'filterInput';
+formForFilter.appendChild(input);
+
+const button = document.createElement('button');
+button.innerText = 'Szűrés';
+formForFilter.appendChild(button);
+
+formForFilter.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const filterInput = e.target.querySelector('#filterInput');
+    const select = e.target.querySelector('select');
+
+    const filteredArray = filter(array, (element) => {
+        if (select.value === 'szerzo') {
+            return filterInput.value === element.szerzo;
+        } else if (select.value === 'mufaj') {
+            return filterInput.value === element.mufaj;
+        } else if (select.value === 'cim') {
+            return filterInput.value === element.cim;
+        } else {
+            return true; // Ha nincs kiválasztva szűrési feltétel, minden elem megjelenik
+        }
+    });
+
+    tbody.innerHTML = ''; // Törli a táblázat jelenlegi tartalmát
+    for (const filteredElement of filteredArray) {
+        const tableBodyRow = document.createElement('tr');
+        tbody.appendChild(tableBodyRow);
+
+        const nameCell = document.createElement('td');
+        nameCell.textContent = filteredElement.szerzo;
+        tableBodyRow.appendChild(nameCell);
+
+        const birthCell = document.createElement('td');
+        birthCell.textContent = filteredElement.mufaj;
+        tableBodyRow.appendChild(birthCell);
+
+        const zipCodeCell = document.createElement('td');
+        zipCodeCell.textContent = filteredElement.cim;
+        tableBodyRow.appendChild(zipCodeCell);
+    }
 });
