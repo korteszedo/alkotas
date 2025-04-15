@@ -32,3 +32,5 @@ const table = new Table('table', manager); // Létrehozza a Table példányt, é
  * A Form osztály felelős az űrlap megjelenítéséért és az adatok beküldéséért.
  */
 const form = new Form('form', fieldConfig, manager); // Létrehozza a Form példányt, és átadja a mezőket és a manager-t
+
+const fileUplad = new Upload('upload', manager); // Létrehozza a FileUpload példányt, és átadja a manager-t

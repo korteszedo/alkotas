@@ -228,3 +228,28 @@ class FormField {
         return div; // Visszaadja a <div> elemet
     }
 }
+
+class Upload extends Area{
+    constructor(cssClass, manager){
+        super(cssClass, manager);
+        const input = document.createElement('input')
+        input.id ='fileinput';
+        input.type ='file'
+        this.div.appendChild(input);
+        input.addEventListener('change', (e)=>{
+            const file = e.target.files[0];
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+               const fileLines = fileReader.result.split('\n')
+               const removedHeadLines = fileLines.slice(1);
+               for(const line of removedHeadLines){
+                    const trimmedLine = line.trim();
+                    const fields = trimmedLine.split(';');
+                    const person = new Person(fields[0], fields[1], fields[2])
+                    this.manager.addPerson(person)
+               }
+            }
+            fileReader.readAsText(file);
+        })
+    }
+}
