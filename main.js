@@ -2,156 +2,127 @@ const array = []; // Egy üres tömb, amely a könyvek adatait tárolja
 
 // Egy függvény, ami létrehoz egy <div> elemet a megadott osztálynévvel
 const makeDiv = (className) => {
-    // Létrehoz egy új <div> elemet
     const div = document.createElement('div');
-    // Beállítja az osztály nevét
     div.className = className;
-    // Visszaadja a létrehozott elemet
     return div;
-}
+};
 
 // Létrehoz egy "container" osztályú <div> elemet
 const containerDiv = makeDiv('container');
-// Hozzáadja a "container" elemet a dokumentum <body> részéhez
 document.body.appendChild(containerDiv);
 
 // Létrehoz egy "table" osztályú <div> elemet
 const tableDiv = makeDiv('table');
 
-// Létrehoz egy "form" osztályú <div> elemet
-const formDiv = makeDiv('form');
-
 // Létrehoz egy <table> elemet
 const tableSim = document.createElement('table');
-// Hozzáadja a <table> elemet a "table" osztályú <div>-hez
 tableDiv.appendChild(tableSim);
 
 // Létrehoz egy <thead> elemet
 const tableHead = document.createElement('thead');
-// Hozzáadja a <thead> elemet a <table>-hez
 tableSim.appendChild(tableHead);
 
 // Létrehoz egy <tr> elemet a táblázat fejléce számára
 const tableHeadRow = document.createElement('tr');
-// Hozzáadja a <tr> elemet a <thead>-hez
 tableHead.appendChild(tableHeadRow);
 
 // A táblázat fejléceinek szövegeit tartalmazó tömb
 const theadCells = ['Szerző', 'Műfaj', 'Cím'];
-// Végigmegy a fejlécek szövegein
 for (const cellContent of theadCells) {
-    // Létrehoz egy <th> elemet
-    const thcell = document.createElement('th');
-    // Beállítja a <th> elem szövegét
-    thcell.innerText = cellContent;
-    // Hozzáadja a <th> elemet a fejléc sorához
-    tableHeadRow.appendChild(thcell);
+    const thcell = document.createElement('th'); // Létrehoz egy <th> elemet
+    thcell.innerText = cellContent; // Beállítja a cella tartalmát
+    tableHeadRow.appendChild(thcell); // Hozzáadja a cellát a fejléc sorhoz
 }
 
 // Létrehoz egy <tbody> elemet
 const tbody = document.createElement('tbody');
-// Hozzáadja a <tbody> elemet a <table>-hez
 tableSim.appendChild(tbody);
+
+// Létrehoz egy "form" osztályú <div> elemet
+const formDiv = makeDiv('form');
 
 // Létrehoz egy <form> elemet
 const formSim = document.createElement('form');
-// Hozzáadja a <form> elemet a "form" osztályú <div>-hez
 formDiv.appendChild(formSim);
 
 // Egy tömb, amely az űrlap mezőinek azonosítóit és címkéit tartalmazza
 const fieldElementList = [
-    {
-        fieldid: 'szerzo', // Azonosító: szerző
-        fieldLabel: 'Szerző' // Címke: Szerző
-    },
-    {
-        fieldid: 'mufaj', // Azonosító: műfaj
-        fieldLabel: 'Műfaj' // Címke: Műfaj
-    },
-    {
-        fieldid: 'cim', // Azonosító: cím
-        fieldLabel: 'Cím' // Címke: Cím
-    }
+    { fieldid: 'szerzo', fieldLabel: 'Szerző' }, // Az első mező: szerző
+    { fieldid: 'mufaj', fieldLabel: 'Műfaj' },  // A második mező: műfaj
+    { fieldid: 'cim', fieldLabel: 'Cím' }       // A harmadik mező: cím
 ];
 
 // Végigmegy az űrlap mezőinek listáján
 for (const fieldElement of fieldElementList) {
-    // Létrehoz egy "field" osztályú <div> elemet
-    const field = makeDiv('field');
-    // Hozzáadja a "field" elemet az űrlaphoz
-    formSim.appendChild(field);
+    const field = makeDiv('field'); // Létrehoz egy "field" osztályú <div> elemet
+    formSim.appendChild(field); // Hozzáadja a mezőt az űrlaphoz
 
-    // Létrehoz egy <label> elemet
-    const label = document.createElement('label');
-    // Beállítja a <label> elem "for" attribútumát az aktuális mező azonosítójára
-    label.htmlFor = fieldElement.fieldid;
-    // Beállítja a <label> elem szövegét az aktuális mező címkéjére
-    label.textContent = fieldElement.fieldLabel;
-    // Hozzáadja a <label> elemet a "field" <div>-hez
-    field.appendChild(label);
+    const label = document.createElement('label'); // Létrehoz egy <label> elemet
+    label.htmlFor = fieldElement.fieldid; // Beállítja a "for" attribútumot
+    label.textContent = fieldElement.fieldLabel; // Beállítja a címkét
+    field.appendChild(label); // Hozzáadja a címkét a mezőhöz
 
-    // Létrehoz egy <input> elemet
-    const input = document.createElement('input');
-    // Beállítja az <input> elem azonosítóját
-    input.id = fieldElement.fieldid;
-    // Hozzáad egy sortörést a "field" <div>-hez
-    field.appendChild(document.createElement('br'));
-    // Hozzáadja az <input> elemet a "field" <div>-hez
-    field.appendChild(input);
+    field.appendChild(document.createElement('br')); // Hozzáad egy sortörést
+
+    const input = document.createElement('input'); // Létrehoz egy <input> elemet
+    input.id = fieldElement.fieldid; // Beállítja az azonosítót
+    field.appendChild(input); // Hozzáadja az input mezőt a mezőhöz
+
+    field.appendChild(document.createElement('br')); // Hozzáad egy sortörést
+
+    const error = document.createElement('span'); // Hibaüzenet helye
+    error.className = 'error'; // Beállítja a hibaüzenet osztályát
+    field.appendChild(error); // Hozzáadja a hibaüzenet mezőt a mezőhöz
 }
 
 // Létrehoz egy <button> elemet az űrlaphoz
 const buttonFormSim = document.createElement('button');
-// Beállítja a gomb szövegét
-buttonFormSim.textContent = 'hozzáadás';
-// Hozzáadja a gombot az űrlaphoz
-formSim.appendChild(buttonFormSim);
+buttonFormSim.textContent = 'hozzáadás'; // Beállítja a gomb szövegét
+formSim.appendChild(buttonFormSim); // Hozzáadja a gombot az űrlaphoz
 
 // Hozzáad egy eseményfigyelőt az űrlaphoz, amely a "submit" eseményre reagál
 formSim.addEventListener('submit', (e) => {
-    // Megakadályozza az alapértelmezett űrlapküldési viselkedést
-    e.preventDefault();
+    e.preventDefault(); // Megakadályozza az alapértelmezett űrlapküldési viselkedést
 
-    // Létrehoz egy üres objektumot az űrlap mezőinek értékeihez
-    const valueObject = {};
-
-    // Kiválasztja az összes <input> elemet az űrlapban
-    const inputFields = e.target.querySelectorAll('input');
+    const valueObject = {}; // Egy objektum az űrlap mezőinek értékeinek tárolására
+    const inputFields = e.target.querySelectorAll('input'); // Kiválasztja az összes <input> elemet
+    let valid = true; // Validációs állapot
 
     // Végigmegy az összes <input> elemeken
     for (const inputField of inputFields) {
-        // Hozzáadja az <input> elem azonosítóját és értékét az objektumhoz
-        valueObject[inputField.id] = inputField.value;
+        const error = inputField.parentElement.querySelector('.error'); // Hibaüzenet helye
+        if (!error) {
+            console.error('Nincs hibaüzenet mező definiálva.'); // Hiba, ha nincs hibaüzenet mező
+            return;
+        }
+        error.textContent = ''; // Törli az előző hibaüzenetet
+
+        if (inputField.value === '') { // Ellenőrzi, hogy az érték üres-e
+            error.textContent = 'Kötelező megadni'; // Hibaüzenet, ha az érték üres
+            valid = false; // A validáció sikertelen
+        }
+
+        valueObject[inputField.id] = inputField.value; // Hozzáadja az értéket az objektumhoz
     }
 
-    // Hozzáadja az objektumot a "könyvek adatait" tároló tömbhöz
-    array.push(valueObject);
+    if (valid) { // Ha minden mező érvényes
+        array.push(valueObject); // Hozzáadja az objektumot a tömbhöz
 
-    // Létrehoz egy új <tr> elemet a táblázat törzséhez
-    const tableBodyRow = document.createElement('tr');
-    // Hozzáadja a <tr> elemet a <tbody>-hoz
-    tbody.appendChild(tableBodyRow);
+        const tableBodyRow = document.createElement('tr'); // Létrehoz egy új <tr> elemet
+        tbody.appendChild(tableBodyRow); // Hozzáadja a sort a táblázathoz
 
-    // Létrehoz egy <td> elemet a névhez
-    const nameCell = document.createElement('td');
-    // Beállítja a <td> elem szövegét a "name" mező értékére
-    nameCell.textContent = valueObject.szerzo;
-    // Hozzáadja a <td> elemet a <tr>-hez
-    tableBodyRow.appendChild(nameCell);
+        const nameCell = document.createElement('td'); // Létrehoz egy új <td> elemet a szerző számára
+        nameCell.textContent = valueObject.szerzo; // Beállítja a cella tartalmát
+        tableBodyRow.appendChild(nameCell); // Hozzáadja a cellát a sorhoz
 
-    // Létrehoz egy <td> elemet a születési dátumhoz
-    const birthCell = document.createElement('td');
-    // Beállítja a <td> elem szövegét a "birth" mező értékére
-    birthCell.textContent = valueObject.mufaj;
-    // Hozzáadja a <td> elemet a <tr>-hez
-    tableBodyRow.appendChild(birthCell);
+        const birthCell = document.createElement('td'); // Létrehoz egy új <td> elemet a műfaj számára
+        birthCell.textContent = valueObject.mufaj; // Beállítja a cella tartalmát
+        tableBodyRow.appendChild(birthCell); // Hozzáadja a cellát a sorhoz
 
-    // Létrehoz egy <td> elemet az irányítószámhoz
-    const zipCodeCell = document.createElement('td');
-    // Beállítja a <td> elem szövegét a "zipcode" mező értékére
-    zipCodeCell.textContent = valueObject.cim;
-    // Hozzáadja a <td> elemet a <tr>-hez
-    tableBodyRow.appendChild(zipCodeCell);
+        const zipCodeCell = document.createElement('td'); // Létrehoz egy új <td> elemet a cím számára
+        zipCodeCell.textContent = valueObject.cim; // Beállítja a cella tartalmát
+        tableBodyRow.appendChild(zipCodeCell); // Hozzáadja a cellát a sorhoz
+    }
 });
 
 // A "table" elemet hozzáadja a "container" elemhez
