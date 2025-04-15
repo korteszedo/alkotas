@@ -115,7 +115,6 @@ class Table extends Area {
  * A Form osztály az Area osztályból származik, és egy űrlapot hoz létre a megadott osztálynévvel.
  */
 class Form extends Area {
-
     #formFieldArray; // Privát mező a FormField objektumok tárolására
 
     /**
@@ -128,14 +127,13 @@ class Form extends Area {
         super(cssClass, manager); // Meghívja az Area osztály konstruktorát
         this.#formFieldArray = []; // Inicializálja a FormField objektumok tömbjét
 
-
         const form = document.createElement('form'); // Létrehoz egy új <form> elemet
         this.div.appendChild(form); // Hozzáadja az űrlapot az Area által létrehozott <div>-hez
 
         for (const fieldElement of fieldElementList) { // Végigmegy az űrlap mezőinek listáján
             const formField = new FormField(fieldElement.fieldid, fieldElement.fieldLabel); // Létrehoz egy új FormField objektumot
-             this.#formFieldArray.push(formField); // Hozzáadja a FormField objektumot a tömbhöz
-             form.appendChild(formField.getDiv()); // Hozzáadja a FormField <div> elemét az űrlaphoz
+            this.#formFieldArray.push(formField); // Hozzáadja a FormField objektumot a tömbhöz
+            form.appendChild(formField.getDiv()); // Hozzáadja a FormField <div> elemét az űrlaphoz
         }
 
         const button = document.createElement('button'); // Létrehoz egy új <button> elemet
@@ -145,26 +143,29 @@ class Form extends Area {
         form.addEventListener('submit', (e) => {
             e.preventDefault(); // Megakadályozza az alapértelmezett űrlapküldést
 
-            
             const valueObject = {}; // Létrehoz egy objektumot az értékek tárolására
+            let valid = true; // Validációs állapot
 
-            let valid = true;
-             for(const formField of this.#formFieldArray){
-                 formField.error = '';
-                 if(formField.value === ''){
-                     formField.error = 'Kotelezo megadni';
-                     valid = false;
-                    }
-                    valueObject[formField.id] = formField.value;
+            for (const formField of this.#formFieldArray) {
+                formField.error = ''; // Törli az előző hibaüzenetet
+                if (formField.value === '') { // Ellenőrzi, hogy az érték üres-e
+                    formField.error = 'Kötelező megadni'; // Hibaüzenet, ha az érték üres
+                    valid = false; // A validáció sikertelen
                 }
-                if(valid){
-                    const person = new Person(valueObject.szerzo, valueObject.mufaj, valueObject.cim);
-                    this.manager.addPerson(person);
-                } 
+                valueObject[formField.id] = formField.value; // Hozzáadja az értéket az objektumhoz
+            }
+
+            if (valid) { // Ha minden mező érvényes
+                const person = new Person(valueObject.szerzo, valueObject.mufaj, valueObject.cim); // Létrehoz egy új Person objektumot
+                this.manager.addPerson(person); // Hozzáadja a személyt a manager-hez
+            }
         });
     }
 }
 
+/**
+ * A FormField osztály egy űrlapmezőt reprezentál, amely tartalmaz egy címkét, egy input mezőt és egy hibaüzenetet.
+ */
 class FormField {
     #id; // Privát mező az űrlapmező azonosítójának tárolására
     #inputElement; // Privát mező az input elem tárolására
