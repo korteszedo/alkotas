@@ -229,27 +229,40 @@ class FormField {
     }
 }
 
-class Upload extends Area{
-    constructor(cssClass, manager){
-        super(cssClass, manager);
-        const input = document.createElement('input')
-        input.id ='fileinput';
-        input.type ='file'
-        this.div.appendChild(input);
-        input.addEventListener('change', (e)=>{
-            const file = e.target.files[0];
-            const fileReader = new FileReader();
+/**
+ * Az Upload osztály az Area osztályból származik, és egy fájlfeltöltő mezőt hoz létre.
+ * A feltöltött fájl tartalmát feldolgozza, és a manager objektumon keresztül hozzáadja a személyeket.
+ */
+class Upload extends Area {
+    /**
+     * Az Upload osztály konstruktora.
+     * @param {string} cssClass - Az új fájlfeltöltőt tartalmazó <div> elemhez rendelendő osztálynév.
+     * @param {Object} manager - A manager objektum, amely a személyek kezelésére szolgál.
+     */
+    constructor(cssClass, manager) {
+        super(cssClass, manager); // Meghívja az Area osztály konstruktorát
+
+        const input = document.createElement('input'); // Létrehoz egy <input> elemet
+        input.id = 'fileinput'; // Beállítja az input elem azonosítóját
+        input.type = 'file'; // Beállítja az input elem típusát fájlfeltöltésre
+        this.div.appendChild(input); // Hozzáadja az input elemet az Area által létrehozott <div>-hez
+
+        // Hozzáad egy eseményfigyelőt a fájlfeltöltő mezőhöz
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0]; // Lekéri a kiválasztott fájlt
+            const fileReader = new FileReader(); // Létrehoz egy FileReader példányt
+
             fileReader.onload = () => {
-               const fileLines = fileReader.result.split('\n')
-               const removedHeadLines = fileLines.slice(1);
-               for(const line of removedHeadLines){
-                    const trimmedLine = line.trim();
-                    const fields = trimmedLine.split(';');
-                    const person = new Person(fields[0], fields[1], fields[2])
-                    this.manager.addPerson(person)
-               }
-            }
-            fileReader.readAsText(file);
-        })
+                const fileLines = fileReader.result.split('\n'); // Feldarabolja a fájl tartalmát sorokra
+                const removedHeadLines = fileLines.slice(1); // Eltávolítja az első sort (fejléc)
+                for (const line of removedHeadLines) {
+                    const trimmedLine = line.trim(); // Eltávolítja a felesleges szóközöket
+                    const fields = trimmedLine.split(';'); // Feldarabolja a sort pontosvesszők mentén
+                    const person = new Person(fields[0], fields[1], fields[2]); // Létrehoz egy új Person objektumot
+                    this.manager.addPerson(person); // Hozzáadja a személyt a manager-hez
+                }
+            };
+            fileReader.readAsText(file); // Beolvassa a fájl tartalmát szövegként
+        });
     }
 }
