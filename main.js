@@ -93,7 +93,7 @@ formSim.addEventListener('submit', (e) => {
     e.preventDefault(); // Megakadályozza az alapértelmezett űrlapküldési viselkedést
 
     const valueObject = {}; // Egy objektum az űrlap mezőinek értékeinek tárolására
-    const inputFields = e.target.querySelectorAll('input'); // Kiválasztja az összes <input> elemet
+    const inputFields = e.target.querySelectorAll('input:not([type="file"])'); // Kiválasztja az összes <input> elemet, kivéve a fájlfeltöltő mezőt
     let valid = true; // Validációs állapot
 
     // Végigmegy az összes <input> elemeken
@@ -105,12 +105,12 @@ formSim.addEventListener('submit', (e) => {
         }
         error.textContent = ''; // Törli az előző hibaüzenetet
 
-        if (inputField.value === '') { // Ellenőrzi, hogy az érték üres-e
+        if (inputField.value.trim() === '') { // Ellenőrzi, hogy az érték üres-e (szóközöket is figyelembe véve)
             error.textContent = 'Kötelező megadni'; // Hibaüzenet, ha az érték üres
             valid = false; // A validáció sikertelen
         }
 
-        valueObject[inputField.id] = inputField.value; // Hozzáadja az értéket az objektumhoz
+        valueObject[inputField.id] = inputField.value.trim(); // Hozzáadja az értéket az objektumhoz
     }
 
     if (valid) { // Ha minden mező érvényes
@@ -145,9 +145,9 @@ fileInput.addEventListener('change', (e) => {
             const trimmedLine = line.trim(); // Eltávolítja a felesleges szóközöket
             const fields = trimmedLine.split(';'); // Feldarabolja a sort pontosvesszők mentén
             const pers = {
-                name: fields[0],
-                birth: fields[1],
-                zipcode: fields[2]
+                szerzo: fields[0], // A fájl első oszlopa a szerző
+                mufaj: fields[1],  // A fájl második oszlopa a műfaj
+                cim: fields[2]     // A fájl harmadik oszlopa a cím
             };
             array.push(pers); // Hozzáadja az objektumot a tömbhöz
 
@@ -155,22 +155,47 @@ fileInput.addEventListener('change', (e) => {
             tbody.appendChild(tableBodyRow); // Hozzáadja a sort a táblázathoz
 
             const nameCell = document.createElement('td'); // Létrehoz egy új <td> elemet a név számára
-            nameCell.textContent = pers.name; // Beállítja a cella tartalmát
+            nameCell.textContent = pers.szerzo; // Beállítja a cella tartalmát
             tableBodyRow.appendChild(nameCell); // Hozzáadja a cellát a sorhoz
 
             const birthCell = document.createElement('td'); // Létrehoz egy új <td> elemet a születési dátum számára
-            birthCell.textContent = pers.birth; // Beállítja a cella tartalmát
+            birthCell.textContent = pers.mufaj; // Beállítja a cella tartalmát
             tableBodyRow.appendChild(birthCell); // Hozzáadja a cellát a sorhoz
 
             const zipCodeCell = document.createElement('td'); // Létrehoz egy új <td> elemet az irányítószám számára
-            zipCodeCell.textContent = pers.zipcode; // Beállítja a cella tartalmát
+            zipCodeCell.textContent = pers.cim; // Beállítja a cella tartalmát
             tableBodyRow.appendChild(zipCodeCell); // Hozzáadja a cellát a sorhoz
         }
     };
     fileReader.readAsText(file); // Beolvassa a fájl tartalmát szövegként
 });
 
+
+
 // A "table" elemet hozzáadja a "container" elemhez
 containerDiv.appendChild(tableDiv);
 // A "form" elemet is hozzáadja a "container" elemhez
 containerDiv.appendChild(formDiv);
+
+// Létrehoz egy "Letöltés" gombot
+const exportButton = document.createElement('button'); // Létrehoz egy <button> elemet
+exportButton.textContent = 'Letöltés'; // Beállítja a gomb szövegét
+containerDiv.appendChild(exportButton); // Hozzáadja a gombot a konténerhez
+
+// Hozzáad egy eseményfigyelőt a "Letöltés" gombhoz
+exportButton.addEventListener('click', () => {
+    const link = document.createElement('a'); // Létrehoz egy <a> elemet
+    const contentArray = ['szerzo;mufaj;cim']; // A CSV fejléc sora
+
+    // Végigmegy az array tömb elemein, és hozzáadja az adatokat a CSV tartalomhoz
+    for (const pers of array) {
+        contentArray.push(`${pers.szerzo};${pers.mufaj};${pers.cim}`); // Hozzáadja az objektum adatait
+    }
+
+    const content = contentArray.join('\n'); // Összefűzi a sorokat új sor karakterrel
+    const file = new Blob([content], { type: 'text/csv' }); // Létrehoz egy új Blob objektumot a tartalommal
+    link.href = URL.createObjectURL(file); // Beállítja a letöltési linket
+    link.download = 'newdata.csv'; // Beállítja a letöltendő fájl nevét
+    link.click(); // Kattintást szimulál a letöltés elindításához
+    URL.revokeObjectURL(link.href); // Felszabadítja az URL-t
+});
