@@ -20,6 +20,13 @@ class Area {
      * @param {string} className - Az új <div> elemhez rendelendő osztálynév.
      */
     constructor(className) {
+        const container = this.#getContainerDiv(); //
+         this.#div = document.createElement('div');
+         this.#div.className = className;
+         container.appendChild(this.#div);
+    }
+
+    #getContainerDiv() {
         // Megkeresi a dokumentumban a "containeroop" osztályú <div> elemet
         let containerDiv = document.querySelector('.containeroop');
         
@@ -32,14 +39,12 @@ class Area {
             // Hozzáadja a dokumentum <body> részéhez
             document.body.appendChild(containerDiv);
         }
+        // Visszaadja a megtalált vagy létrehozott <div> elemet
+        return containerDiv;
 
-        // Létrehoz egy új <div> elemet
-        this.#div = document.createElement('div');
-        // Beállítja az osztálynevét a megadott értékre
-        this.#div.className = className;
-        // Hozzáadja az új <div> elemet a "containeroop" konténerhez
-        containerDiv.appendChild(this.#div);
     }
+
+
 }
 
 /**
@@ -55,6 +60,16 @@ class Table extends Area {
         // Meghívja az Area osztály konstruktorát
         super(cssClass);
 
+        // Létrehozza a táblázatot és visszaadja a <tbody> elemet
+        const tbody = this.#createTable();
+        // A <tbody> elem későbbi használatra elérhető lesz
+    }
+
+    /**
+     * Privát metódus, amely létrehozza a táblázatot.
+     * @returns {HTMLTableSectionElement} - A létrehozott <tbody> elem.
+     */
+    #createTable() {
         // Létrehoz egy <table> elemet
         const table = document.createElement('table');
         // Hozzáadja a <table> elemet az Area által létrehozott <div>-hez
@@ -86,6 +101,9 @@ class Table extends Area {
         const tbody = document.createElement('tbody');
         // Hozzáadja a <tbody> elemet a <table>-hez
         table.appendChild(tbody);
+
+        // Visszaadja a létrehozott <tbody> elemet
+        return tbody;
     }
 }
 
@@ -97,8 +115,9 @@ class Form extends Area {
     /**
      * A Form osztály konstruktora.
      * @param {string} cssClass - Az új űrlapot tartalmazó <div> elemhez rendelendő osztálynév.
+     * @param {Array} fieldElementList - Az űrlap mezőinek azonosítóit és címkéit tartalmazó tömb.
      */
-    constructor(cssClass) {
+    constructor(cssClass, fieldElementList) {
         // Meghívja az Area osztály konstruktorát
         super(cssClass);
 
@@ -106,22 +125,6 @@ class Form extends Area {
         const form = document.createElement('form');
         // Hozzáadja a <form> elemet az Area által létrehozott <div>-hez
         this.div.appendChild(form);
-
-        // Egy tömb, amely az űrlap mezőinek azonosítóit és címkéit tartalmazza
-        const fieldElementList = [
-            {
-                fieldid: 'szerzo', // Azonosító: szerző
-                fieldLabel: 'Szerző' // Címke: Szerző
-            },
-            {
-                fieldid: 'mufaj', // Azonosító: műfaj
-                fieldLabel: 'Műfaj' // Címke: Műfaj
-            },
-            {
-                fieldid: 'cim', // Azonosító: cím
-                fieldLabel: 'Cím' // Címke: Cím
-            }
-        ];
 
         // Végigmegy az űrlap mezőinek listáján
         for (const fieldElement of fieldElementList) {
