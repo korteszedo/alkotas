@@ -88,3 +88,72 @@ class Table extends Area {
         table.appendChild(tbody);
     }
 }
+
+/**
+ * A Form osztály az Area osztályból származik, és egy űrlapot hoz létre a megadott osztálynévvel.
+ */
+class Form extends Area {
+
+    /**
+     * A Form osztály konstruktora.
+     * @param {string} cssClass - Az új űrlapot tartalmazó <div> elemhez rendelendő osztálynév.
+     */
+    constructor(cssClass) {
+        // Meghívja az Area osztály konstruktorát
+        super(cssClass);
+
+        // Létrehoz egy <form> elemet
+        const form = document.createElement('form');
+        // Hozzáadja a <form> elemet az Area által létrehozott <div>-hez
+        this.div.appendChild(form);
+
+        // Egy tömb, amely az űrlap mezőinek azonosítóit és címkéit tartalmazza
+        const fieldElementList = [
+            {
+                fieldid: 'szerzo', // Azonosító: szerző
+                fieldLabel: 'Szerző' // Címke: Szerző
+            },
+            {
+                fieldid: 'mufaj', // Azonosító: műfaj
+                fieldLabel: 'Műfaj' // Címke: Műfaj
+            },
+            {
+                fieldid: 'cim', // Azonosító: cím
+                fieldLabel: 'Cím' // Címke: Cím
+            }
+        ];
+
+        // Végigmegy az űrlap mezőinek listáján
+        for (const fieldElement of fieldElementList) {
+            // Létrehoz egy "field" osztályú <div> elemet
+            const field = makeDiv('field');
+            // Hozzáadja a "field" elemet az űrlaphoz
+            form.appendChild(field);
+
+            // Létrehoz egy <label> elemet
+            const label = document.createElement('label');
+            // Beállítja a <label> elem "for" attribútumát az aktuális mező azonosítójára
+            label.htmlFor = fieldElement.fieldid;
+            // Beállítja a <label> elem szövegét az aktuális mező címkéjére
+            label.textContent = fieldElement.fieldLabel;
+            // Hozzáadja a <label> elemet a "field" <div>-hez
+            field.appendChild(label);
+
+            // Létrehoz egy <input> elemet
+            const input = document.createElement('input');
+            // Beállítja az <input> elem azonosítóját
+            input.id = fieldElement.fieldid;
+            // Hozzáad egy sortörést a "field" <div>-hez
+            field.appendChild(document.createElement('br'));
+            // Hozzáadja az <input> elemet a "field" <div>-hez
+            field.appendChild(input);
+        }
+
+        // Létrehoz egy <button> elemet az űrlaphoz
+        const button = document.createElement('button');
+        // Beállítja a gomb szövegét
+        button.textContent = 'hozzáadás';
+        // Hozzáadja a gombot az űrlaphoz
+        form.appendChild(button);
+    }
+}

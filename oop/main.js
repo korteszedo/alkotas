@@ -7,4 +7,4 @@ document.body.appendChild(separator);
 const table = new Table('table');
 
 // Létrehoz egy új "form" osztályú <div> elemet az Area osztály segítségével
-const form = new Area('form');
+const form = new Form('form');
